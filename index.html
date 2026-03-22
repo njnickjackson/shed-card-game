@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shed</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- START SCREEN -->
+  <div id="screen-start" class="screen active">
+    <div class="start-content">
+      <h1 class="game-title">SHED</h1>
+      <p class="subtitle">The last one with cards loses.</p>
+      <button id="btn-start" class="btn-primary">Start Game</button>
+    </div>
+  </div>
+
+  <!-- PLAYER SELECT SCREEN -->
+  <div id="screen-players" class="screen">
+    <div class="player-select-content">
+      <h2>How many players?</h2>
+      <div class="player-options">
+        <button class="btn-player-count" data-count="2">
+          <span class="count">2</span>
+          <span class="label">Players</span>
+          <span class="note">You vs 1 CPU</span>
+        </button>
+        <button class="btn-player-count" data-count="4">
+          <span class="count">3–5</span>
+          <span class="label">Players</span>
+          <span class="note">You vs 2–4 CPUs</span>
+        </button>
+        <button class="btn-player-count" data-count="6">
+          <span class="count">6</span>
+          <span class="label">Players</span>
+          <span class="note">You vs 5 CPUs · Jokers included</span>
+        </button>
+      </div>
+      <div id="player-count-picker" class="count-picker hidden">
+        <p>Choose exact number of players (3–5):</p>
+        <div class="count-btns">
+          <button class="btn-exact" data-n="3">3</button>
+          <button class="btn-exact" data-n="4">4</button>
+          <button class="btn-exact" data-n="5">5</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="screen-game" class="screen">
+    <div id="game-layout">
+
+      <!-- CPU players rendered here -->
+      <div id="cpu-area"></div>
+
+      <!-- Center area -->
+      <div id="center-area">
+        <div id="draw-pile-area">
+          <div id="draw-pile" class="card-back pile-card"></div>
+          <div id="draw-count" class="pile-count">0</div>
+          <div class="pile-label">Draw Pile</div>
+        </div>
+        <div id="play-pile-area">
+          <div id="play-pile" class="play-pile-display"></div>
+          <div class="pile-label">Play Pile</div>
+        </div>
+        <div id="direction-indicator" class="direction-indicator">↻</div>
+      </div>
+
+      <!-- Human player -->
+      <div id="human-area">
+        <div id="human-table-cards" class="table-cards-row"></div>
+        <div id="human-hand-label" class="hand-label">Cards in hand</div>
+        <div id="human-hand" class="hand-row"></div>
+        <div id="action-area">
+          <button id="btn-play" class="btn-action" disabled>Play Selected</button>
+          <button id="btn-pickup" class="btn-action btn-secondary">Pick Up Pile</button>
+          <button id="btn-confirm-facedown" class="btn-action hidden">Flip Card</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Status / log -->
+    <div id="status-bar">
+      <span id="status-msg">Welcome to Shed!</span>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <p id="modal-msg"></p>
+      <button id="modal-ok" class="btn-primary">OK</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
