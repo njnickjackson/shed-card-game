@@ -944,8 +944,16 @@ function showScreen(id) {
 
 // ── Event Listeners ───────────────────────────────────────────────────────────
 
+function isMobile() {
+  return window.matchMedia('(pointer: coarse)').matches && window.innerWidth <= 768;
+}
+
 document.getElementById('btn-start').addEventListener('click', () => {
-  showScreen('screen-players');
+  if (isMobile()) {
+    startNewGame(2);
+  } else {
+    showScreen('screen-players');
+  }
 });
 
 document.querySelectorAll('.btn-player-count').forEach(btn => {
