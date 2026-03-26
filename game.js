@@ -171,10 +171,10 @@ function determineFirstPlayer() {
 
     // Sort by suit order
     candidates.sort((a, b) => SUIT_ORDER[a.card.suit] - SUIT_ORDER[b.card.suit]);
-    return candidates[0].player.id;
+    return { playerId: candidates[0].player.id, card: candidates[0].card };
   }
   // Fallback: player 0
-  return G.players[0].id;
+  return { playerId: G.players[0].id, card: null };
 }
 
 // ── Game Init ─────────────────────────────────────────────────────────────────
@@ -205,11 +205,17 @@ function initGame(numPlayers) {
   dealGame(exactCount);
 
   // Determine first player
-  const firstId = determineFirstPlayer();
-  G.currentPlayerIdx = G.players.findIndex(p => p.id === firstId);
+  const firstResult = determineFirstPlayer();
+  G.currentPlayerIdx = G.players.findIndex(p => p.id === firstResult.playerId);
 
   renderGame();
   updateStatus(`${G.players[G.currentPlayerIdx].name}'s turn first.`);
+
+  const firstPlayer = G.players[G.currentPlayerIdx];
+  const startCard = firstResult.card ? ` the ${displayCard(firstResult.card)}` : '';
+  updatePrevTurn(firstPlayer.isHuman
+    ? `Game start – you have the lowest card, ${startCard}, and go first.`
+    : `Game start – ${firstPlayer.name} had the lowest card and started with ${startCard}.`);
 
   // Start turn
   setTimeout(nextTurn, 400);
@@ -427,6 +433,7 @@ function onPickupPile() {
   player.hand.push(...G.pile);
   G.pile = [];
   logMsg(`${player.name} picked up the pile.`);
+  updatePrevTurn(`Previous turn – you picked up the pile.`);
   updateStatus("You picked up the pile.");
   G.selectedCards = [];
   renderGame();
@@ -451,6 +458,7 @@ function flipFacedownCard(player, slotIdx) {
     player.hand.push(...G.pile, card);
     G.pile = [];
     logMsg(`${player.name} flipped ${displayCard(card)} – can't play it, picks up the pile.`);
+    updatePrevTurn(`Previous turn – you flipped ${displayCard(card)} – couldn't play it and picked up the pile.`);
     updateStatus(`Flipped ${displayCard(card)} – can't play it. Picked up pile.`);
     renderGame();
     advanceTurn();
@@ -484,6 +492,7 @@ function playCards(player, cards, source) {
     G.direction *= -1;
     logMsg('Direction reversed!');
     updateStatus('Direction reversed!');
+    updatePrevTurn(`Previous turn – ${player.name} played a Joker and reversed direction.`);
     renderGame();
     // Joker is invisible – current player draws/keeps turn? No – it still advances
     drawBackUp(player);
@@ -497,6 +506,7 @@ function playCards(player, cards, source) {
     burnPile();
     drawBackUp(player);
     renderGame();
+    updatePrevTurn(`Previous turn – ${player.name} played a 10 and burned the pile.`);
     updateStatus(`${player.name} played a 10 – pile burned! Play again.`);
     // Same player goes again
     setTimeout(nextTurn, CPU_DELAY);
@@ -508,6 +518,7 @@ function playCards(player, cards, source) {
     burnPile();
     drawBackUp(player);
     renderGame();
+    updatePrevTurn(`Previous turn – ${player.name} completed four of a kind and burned the pile.`);
     updateStatus(`Four of a kind! Pile burned! ${player.name} plays again.`);
     setTimeout(nextTurn, CPU_DELAY);
     return;
@@ -517,7 +528,10 @@ function playCards(player, cards, source) {
   let skipCount = 1;
   if (cards[0].rank === '8') {
     skipCount = 1 + cards.length; // 1 normal advance + extra skips
+    updatePrevTurn(`Previous turn – ${player.name} played ${cards.length > 1 ? cards.length + ' eights' : 'an 8'} and skipped ${cards.length} player${cards.length > 1 ? 's' : ''}.`);
     updateStatus(`${player.name} played ${cards.length} eight(s) – skip ${cards.length} player(s)!`);
+  } else {
+    updatePrevTurn(`Previous turn – ${player.name} played ${rankStr}.`);
   }
 
   // Draw back up to 3
@@ -587,6 +601,7 @@ function executeCPUTurn(player) {
       player.hand.push(...G.pile, card);
       G.pile = [];
       logMsg(`${player.name} flipped ${displayCard(card)} – can't play it, picks up the pile.`);
+      updatePrevTurn(`Previous turn – ${player.name} flipped ${displayCard(card)} – couldn't play it and picked up the pile.`);
       updateStatus(`${player.name} flipped ${displayCard(card)} – can't play it.`);
       renderGame();
       advanceTurn();
@@ -606,6 +621,7 @@ function executeCPUTurn(player) {
     player.hand.push(...G.pile);
     G.pile = [];
     logMsg(`${player.name} picks up the pile.`);
+    updatePrevTurn(`Previous turn – ${player.name} picked up the pile.`);
     updateStatus(`${player.name} picks up the pile.`);
     renderGame();
     advanceTurn();
@@ -898,6 +914,10 @@ function updateStatus(msg) {
   document.getElementById('status-msg').textContent = msg;
   G.log = G.log || [];
   G.log.push(msg);
+}
+
+function updatePrevTurn(msg) {
+  document.getElementById('prev-turn-msg').textContent = msg;
 }
 
 function logMsg(msg) {

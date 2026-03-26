@@ -237,6 +237,8 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  align-self: center;
+  padding: 8px 14px;
 }
 
 /* ─── Card Rows ──────────────────────────────────────────────────────────────── */
@@ -370,6 +372,13 @@ body {
   flex-shrink: 0;
 }
 #status-msg { color: rgba(255,255,255,.9); }
+#prev-turn-msg {
+  color: rgba(255,255,255,.5);
+  font-size: .8rem;
+  font-style: italic;
+  min-height: 1em;
+  margin-bottom: 3px;
+}
 
 /* ─── Modal ──────────────────────────────────────────────────────────────────── */
 .modal {
