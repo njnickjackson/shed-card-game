@@ -214,7 +214,7 @@ function initGame(numPlayers) {
   const firstPlayer = G.players[G.currentPlayerIdx];
   const startCard = firstResult.card ? ` the ${displayCard(firstResult.card)}` : '';
   updatePrevTurn(firstPlayer.isHuman
-    ? `Game start – you have the lowest card, ${startCard}, and go first.`
+    ? `Game start – you have the lowest card, ${startCard}. You go first.`
     : `Game start – ${firstPlayer.name} had the lowest card and started with ${startCard}.`);
 
   // Start turn
