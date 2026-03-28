@@ -422,4 +422,17 @@ body {
 /* ─── Responsive ─────────────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
   :root { --card-w: 56px; --card-h: 78px; }
+
+  /* Keep card text within the smaller card bounds */
+  .card { font-size: .65rem; padding: 3px 4px; }
+  .card-suit { font-size: .85rem; }
+  .card-center { font-size: 1.1rem; }
+
+  /* Use dynamic viewport height so the status bar isn't hidden behind browser chrome */
+  body { min-height: 100dvh; }
+  #screen-game { height: 100dvh; }
+  .screen { height: 100dvh; }
+
+  /* Add bottom safe-area padding so the status bar clears the home indicator on iOS */
+  #status-bar { padding-bottom: calc(6px + env(safe-area-inset-bottom)); }
 }
