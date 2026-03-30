@@ -137,9 +137,14 @@ function dealGame(numPlayers) {
   });
 
   // Deal faceup table cards (on top of facedown)
+  // CPU players get their faceup cards automatically; human player chooses theirs during setup
   G.players.forEach(p => {
     for (let i = 0; i < tableCount; i++) {
-      p.faceUp.push(deck.pop());
+      if (p.isHuman) {
+        p.hand.push(deck.pop()); // held in hand until player chooses placement
+      } else {
+        p.faceUp.push(deck.pop());
+      }
     }
   });
 
@@ -188,7 +193,7 @@ function initGame(numPlayers) {
     pile: [],
     currentPlayerIdx: 0,
     direction: 1, // 1 = clockwise, -1 = counter-clockwise
-    phase: 'hand', // 'hand' | 'faceup' | 'facedown' | 'over'
+    phase: 'setup', // 'setup' | 'hand' | 'faceup' | 'facedown' | 'over'
     tableCount: exactCount === 2 ? 4 : 3,
     selectedCards: [],
     awaitingHumanFacedown: false,
@@ -208,23 +213,79 @@ function initGame(numPlayers) {
   const firstResult = determineFirstPlayer();
   G.currentPlayerIdx = G.players.findIndex(p => p.id === firstResult.playerId);
 
-  renderGame();
-  updateStatus(`${G.players[G.currentPlayerIdx].name}'s turn first.`);
+  // Store first player info for after setup completes
+  G.setupFirstResult = firstResult;
 
+  renderGame();
+  startSetupPhase();
+}
+
+// ── Setup Phase (human chooses face-up cards) ─────────────────────────────────
+
+function startSetupPhase() {
+  G.selectedCards = [];
+  document.getElementById('btn-play').textContent = 'Place Face Up';
+  document.getElementById('btn-play').disabled = true;
+  setPickupButton(false);
+  document.getElementById('btn-confirm-facedown').classList.add('hidden');
+  updateStatus(`Select ${G.tableCount} cards from your hand to place face-up on the table.`);
+  renderGame();
+}
+
+function onSetupCardClick(cardId, source) {
+  if (source !== 'hand') return;
+  const idx = G.selectedCards.indexOf(cardId);
+  if (idx === -1) {
+    if (G.selectedCards.length >= G.tableCount) {
+      updateStatus(`You can only select ${G.tableCount} cards. Deselect one first.`);
+      return;
+    }
+    G.selectedCards.push(cardId);
+  } else {
+    G.selectedCards.splice(idx, 1);
+  }
+  const remaining = G.tableCount - G.selectedCards.length;
+  if (remaining > 0) {
+    updateStatus(`Select ${remaining} more card${remaining !== 1 ? 's' : ''} to place face-up.`);
+  } else {
+    updateStatus(`Ready! Click "Place Face Up" to confirm.`);
+  }
+  document.getElementById('btn-play').disabled = G.selectedCards.length !== G.tableCount;
+  document.querySelectorAll('.card[data-id]').forEach(el => {
+    el.classList.toggle('selected', G.selectedCards.includes(el.dataset.id));
+  });
+}
+
+function confirmSetupSelection() {
+  if (G.selectedCards.length !== G.tableCount) return;
+  const player = G.players[G.humanIdx];
+
+  G.selectedCards.forEach(cardId => {
+    const i = player.hand.findIndex(c => c.id === cardId);
+    if (i !== -1) player.faceUp.push(player.hand.splice(i, 1)[0]);
+  });
+  G.selectedCards = [];
+
+  document.getElementById('btn-play').textContent = 'Play Selected';
+
+  G.phase = 'hand';
+
+  const firstResult = G.setupFirstResult;
   const firstPlayer = G.players[G.currentPlayerIdx];
   const startCard = firstResult.card ? ` the ${displayCard(firstResult.card)}` : '';
   updatePrevTurn(firstPlayer.isHuman
     ? `Game start – you have the lowest card, ${startCard}. You go first.`
     : `Game start – ${firstPlayer.name} had the lowest card and started with ${startCard}.`);
+  updateStatus(`${firstPlayer.name}'s turn first.`);
 
-  // Start turn
+  renderGame();
   setTimeout(nextTurn, 400);
 }
 
 // ── Turn Logic ────────────────────────────────────────────────────────────────
 
 function nextTurn() {
-  if (G.phase === 'over') return;
+  if (G.phase === 'over' || G.phase === 'setup') return;
 
   const player = currentPlayer();
 
@@ -348,6 +409,10 @@ function getPlayerSource(player) {
 
 function onCardClick(cardId, source, slotIdx) {
   if (G.phase === 'over') return;
+  if (G.phase === 'setup') {
+    onSetupCardClick(cardId, source);
+    return;
+  }
   const player = currentPlayer();
   if (!player.isHuman) return;
 
@@ -403,6 +468,10 @@ function findCardById(player, cardId) {
 }
 
 function onPlaySelected() {
+  if (G.phase === 'setup') {
+    confirmSetupSelection();
+    return;
+  }
   if (G.selectedCards.length === 0) return;
   const player = currentPlayer();
   const source = getPlayerSource(player);
@@ -841,13 +910,23 @@ function renderHumanPlayer() {
   handRow.innerHTML = '';
   const source = getPlayerSource(player);
 
+  const handLabel = document.getElementById('human-hand-label');
+  if (G.phase === 'setup') {
+    const remaining = G.tableCount - G.selectedCards.length;
+    handLabel.textContent = remaining > 0
+      ? `Choose ${remaining} card${remaining !== 1 ? 's' : ''} to place face-up`
+      : 'Ready to confirm!';
+  } else {
+    handLabel.textContent = 'Cards in hand';
+  }
+
   const sortedHand = [...player.hand].sort((a, b) => cardValue(a) - cardValue(b));
   sortedHand.forEach(card => {
     const el = buildCardEl(card);
     const isSelected = G.selectedCards.includes(card.id);
     if (isSelected) el.classList.add('selected');
 
-    if (source === 'hand' && currentPlayer() === player) {
+    if (G.phase === 'setup' || (source === 'hand' && currentPlayer() === player)) {
       el.addEventListener('click', () => onCardClick(card.id, 'hand', null));
     } else {
       el.classList.add('no-hover');
