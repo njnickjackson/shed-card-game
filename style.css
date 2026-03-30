@@ -257,6 +257,7 @@ body {
   border: 1px solid rgba(0,0,0,.2);
   cursor: pointer;
   user-select: none;
+  touch-action: manipulation;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -271,7 +272,8 @@ body {
   flex-shrink: 0;
 }
 .card:hover:not(.no-hover) { transform: translateY(-6px); box-shadow: 0 8px 16px rgba(0,0,0,.4); }
-.card.selected {
+.card.selected,
+.card.selected:hover:not(.no-hover) {
   transform: translateY(-10px);
   box-shadow: 0 0 0 3px var(--gold), 0 10px 20px rgba(0,0,0,.4);
 }

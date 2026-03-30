@@ -382,7 +382,11 @@ function onCardClick(cardId, source, slotIdx) {
   }
 
   setPlayButton(G.selectedCards.length > 0);
-  renderGame();
+  // Update selected state on existing elements without a full re-render,
+  // which would destroy/recreate card nodes and cause a transition stutter.
+  document.querySelectorAll('.card[data-id]').forEach(el => {
+    el.classList.toggle('selected', G.selectedCards.includes(el.dataset.id));
+  });
 }
 
 function findCard(player, cardId, source) {
