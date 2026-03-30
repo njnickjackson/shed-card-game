@@ -841,7 +841,8 @@ function renderHumanPlayer() {
   handRow.innerHTML = '';
   const source = getPlayerSource(player);
 
-  player.hand.forEach(card => {
+  const sortedHand = [...player.hand].sort((a, b) => cardValue(a) - cardValue(b));
+  sortedHand.forEach(card => {
     const el = buildCardEl(card);
     const isSelected = G.selectedCards.includes(card.id);
     if (isSelected) el.classList.add('selected');
