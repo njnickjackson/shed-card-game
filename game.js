@@ -437,7 +437,7 @@ function onPickupPile() {
   player.hand.push(...G.pile);
   G.pile = [];
   logMsg(`${player.name} picked up the pile.`);
-  updatePrevTurn(`Previous turn – you picked up the pile.`);
+  updatePrevTurn(`You picked up the pile.`);
   updateStatus("You picked up the pile.");
   G.selectedCards = [];
   renderGame();
@@ -462,7 +462,7 @@ function flipFacedownCard(player, slotIdx) {
     player.hand.push(...G.pile, card);
     G.pile = [];
     logMsg(`${player.name} flipped ${displayCard(card)} – can't play it, picks up the pile.`);
-    updatePrevTurn(`Previous turn – you flipped ${displayCard(card)} – couldn't play it and picked up the pile.`);
+    updatePrevTurn(`You flipped ${displayCard(card)} – couldn't play it and picked up the pile.`);
     updateStatus(`Flipped ${displayCard(card)} – can't play it. Picked up pile.`);
     renderGame();
     advanceTurn();
@@ -496,7 +496,7 @@ function playCards(player, cards, source) {
     G.direction *= -1;
     logMsg('Direction reversed!');
     updateStatus('Direction reversed!');
-    updatePrevTurn(`Previous turn – ${player.name} played a Joker and reversed direction.`);
+    updatePrevTurn(`${player.name} played a Joker and reversed direction.`);
     renderGame();
     // Joker is invisible – current player draws/keeps turn? No – it still advances
     drawBackUp(player);
@@ -510,7 +510,7 @@ function playCards(player, cards, source) {
     burnPile();
     drawBackUp(player);
     renderGame();
-    updatePrevTurn(`Previous turn – ${player.name} played a 10 and burned the pile.`);
+    updatePrevTurn(`${player.name} played a 10 and burned the pile.`);
     updateStatus(`${player.name} played a 10 – pile burned! Play again.`);
     // Same player goes again
     setTimeout(nextTurn, CPU_DELAY);
@@ -522,7 +522,7 @@ function playCards(player, cards, source) {
     burnPile();
     drawBackUp(player);
     renderGame();
-    updatePrevTurn(`Previous turn – ${player.name} completed four of a kind and burned the pile.`);
+    updatePrevTurn(`${player.name} completed four of a kind and burned the pile.`);
     updateStatus(`Four of a kind! Pile burned! ${player.name} plays again.`);
     setTimeout(nextTurn, CPU_DELAY);
     return;
@@ -532,10 +532,10 @@ function playCards(player, cards, source) {
   let skipCount = 1;
   if (cards[0].rank === '8') {
     skipCount = 1 + cards.length; // 1 normal advance + extra skips
-    updatePrevTurn(`Previous turn – ${player.name} played ${cards.length > 1 ? cards.length + ' eights' : 'an 8'} and skipped ${cards.length} player${cards.length > 1 ? 's' : ''}.`);
+    updatePrevTurn(`${player.name} played ${cards.length > 1 ? cards.length + ' eights' : 'an 8'} and skipped ${cards.length} player${cards.length > 1 ? 's' : ''}.`);
     updateStatus(`${player.name} played ${cards.length} eight(s) – skip ${cards.length} player(s)!`);
   } else {
-    updatePrevTurn(`Previous turn – ${player.name} played ${rankStr}.`);
+    updatePrevTurn(`${player.name} played ${rankStr}.`);
   }
 
   // Draw back up to 3
@@ -605,7 +605,7 @@ function executeCPUTurn(player) {
       player.hand.push(...G.pile, card);
       G.pile = [];
       logMsg(`${player.name} flipped ${displayCard(card)} – can't play it, picks up the pile.`);
-      updatePrevTurn(`Previous turn – ${player.name} flipped ${displayCard(card)} – couldn't play it and picked up the pile.`);
+      updatePrevTurn(`${player.name} flipped ${displayCard(card)} – couldn't play it and picked up the pile.`);
       updateStatus(`${player.name} flipped ${displayCard(card)} – can't play it.`);
       renderGame();
       advanceTurn();
@@ -625,7 +625,7 @@ function executeCPUTurn(player) {
     player.hand.push(...G.pile);
     G.pile = [];
     logMsg(`${player.name} picks up the pile.`);
-    updatePrevTurn(`Previous turn – ${player.name} picked up the pile.`);
+    updatePrevTurn(`${player.name} picked up the pile.`);
     updateStatus(`${player.name} picks up the pile.`);
     renderGame();
     advanceTurn();
@@ -921,7 +921,8 @@ function updateStatus(msg) {
 }
 
 function updatePrevTurn(msg) {
-  document.getElementById('prev-turn-msg').textContent = msg;
+  document.getElementById('prev-turn-msg').textContent = document.getElementById('curr-turn-msg').textContent;
+  document.getElementById('curr-turn-msg').textContent = msg;
 }
 
 function logMsg(msg) {

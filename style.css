@@ -375,7 +375,13 @@ body {
 }
 #status-msg { color: rgba(255,255,255,.9); }
 #prev-turn-msg {
-  color: rgba(255,255,255,.5);
+  color: rgba(255,255,255,.35);
+  font-size: .75rem;
+  font-style: italic;
+  min-height: 1em;
+}
+#curr-turn-msg {
+  color: rgba(255,255,255,.6);
   font-size: .8rem;
   font-style: italic;
   min-height: 1em;
