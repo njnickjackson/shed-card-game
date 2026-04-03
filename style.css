@@ -45,6 +45,111 @@ body {
   letter-spacing: .05em;
 }
 
+/* ─── Rules Link Button (start screen) ──────────────────────────────────────── */
+.btn-rules-link {
+  display: block;
+  margin: 1rem auto 0;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.5);
+  font-size: .95rem;
+  cursor: pointer;
+  letter-spacing: .05em;
+  transition: color .15s;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.btn-rules-link:hover { color: var(--gold); }
+
+/* ─── Rules Screen ───────────────────────────────────────────────────────────── */
+.rules-content {
+  width: min(680px, 92vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2rem 2.5rem 3rem;
+  animation: fadeIn .4s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--felt-mid) transparent;
+}
+.rules-content::-webkit-scrollbar { width: 6px; }
+.rules-content::-webkit-scrollbar-thumb { background: var(--felt-mid); border-radius: 3px; }
+
+.btn-rules-back {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.55);
+  font-size: .9rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+  transition: color .15s;
+  letter-spacing: .03em;
+}
+.btn-rules-back:hover { color: var(--white); }
+
+.rules-title {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: .1em;
+  margin-bottom: 1.75rem;
+}
+
+.rules-section {
+  margin-bottom: 1.75rem;
+}
+.rules-section h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--gold);
+  margin-bottom: .6rem;
+  border-bottom: 1px solid rgba(244,162,97,.25);
+  padding-bottom: .35rem;
+}
+.rules-section p, .rules-section li {
+  font-size: .95rem;
+  color: rgba(255,255,255,.82);
+  line-height: 1.65;
+}
+.rules-section ul, .rules-section ol {
+  padding-left: 1.4rem;
+}
+.rules-section li { margin-bottom: .35rem; }
+.rules-section strong { color: var(--white); }
+
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .92rem;
+  margin-top: .25rem;
+}
+.rules-table th {
+  text-align: left;
+  padding: .45rem .75rem;
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.6);
+  font-weight: 600;
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.rules-table td {
+  padding: .55rem .75rem;
+  color: rgba(255,255,255,.82);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  line-height: 1.5;
+}
+.rules-table td:first-child {
+  font-weight: 700;
+  color: var(--gold);
+  white-space: nowrap;
+  width: 4.5rem;
+}
+.rules-table tr:last-child td { border-bottom: none; }
+
 /* ─── Buttons ────────────────────────────────────────────────────────────────── */
 .btn-primary {
   background: var(--gold);

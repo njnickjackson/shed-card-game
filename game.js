@@ -1118,6 +1118,14 @@ function isMobile() {
   return window.matchMedia('(pointer: coarse)').matches && window.innerWidth <= 768;
 }
 
+document.getElementById('btn-rules').addEventListener('click', () => {
+  showScreen('screen-rules');
+});
+
+document.getElementById('btn-rules-back').addEventListener('click', () => {
+  showScreen('screen-start');
+});
+
 document.getElementById('btn-start').addEventListener('click', () => {
   if (isMobile()) {
     startNewGame(2);
