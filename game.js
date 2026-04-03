@@ -108,6 +108,19 @@ function canPlaySet(cards) {
   return canPlay(cards[0]);
 }
 
+// Returns the rank if the player may play all hand cards + matching face-up cards together.
+// Conditions: draw pile empty, all hand cards share the same playable rank,
+// and at least one face-up table card has that same rank.
+function getMixedPlayRank(player) {
+  if (G.drawPile.length > 0) return null;
+  if (player.hand.length === 0) return null;
+  const rank = player.hand[0].rank;
+  if (!player.hand.every(c => c.rank === rank)) return null;
+  if (!canPlay(player.hand[0])) return null;
+  if (!player.faceUp.some(c => c && c.rank === rank)) return null;
+  return rank;
+}
+
 // ── Player factory ───────────────────────────────────────────────────────────
 
 function makePlayer(id, name, isHuman) {
@@ -391,7 +404,12 @@ function startHumanTurn() {
     setPickupButton(false);
     document.getElementById('btn-confirm-facedown').classList.remove('hidden');
   } else {
-    updateStatus("Your turn – select card(s) to play.");
+    const mixedRank = getMixedPlayRank(player);
+    if (mixedRank) {
+      updateStatus(`Your turn – you can play your hand cards and also include the ${mixedRank}(s) from your table!`);
+    } else {
+      updateStatus("Your turn – select card(s) to play.");
+    }
     setPlayButton(false);
     setPickupButton(true);
     document.getElementById('btn-confirm-facedown').classList.add('hidden');
@@ -490,11 +508,25 @@ function onPlaySelected() {
     return;
   }
 
+  // Detect mixed play: hand + face-up cards played together
+  let effectiveSource = source;
+  if (source === 'hand') {
+    const hasFaceUpSelected = cards.some(c => player.faceUp.some(fu => fu && fu.id === c.id));
+    if (hasFaceUpSelected) {
+      // All hand cards must be included when combining with face-up cards
+      if (!player.hand.every(c => G.selectedCards.includes(c.id))) {
+        updateStatus("You must play all of your hand cards when combining with face-up cards.");
+        return;
+      }
+      effectiveSource = 'mixed';
+    }
+  }
+
   G.selectedCards = [];
   setPlayButton(false);
   setPickupButton(false);
 
-  playCards(player, cards, source);
+  playCards(player, cards, effectiveSource);
 }
 
 function onPickupPile() {
@@ -548,6 +580,15 @@ function playCards(player, cards, source) {
     } else if (source === 'faceup') {
       const i = player.faceUp.findIndex(c => c && c.id === card.id);
       if (i !== -1) player.faceUp[i] = null;
+    } else if (source === 'mixed') {
+      // Card may be from hand or face-up
+      const handIdx = player.hand.findIndex(c => c.id === card.id);
+      if (handIdx !== -1) {
+        player.hand.splice(handIdx, 1);
+      } else {
+        const fuIdx = player.faceUp.findIndex(c => c && c.id === card.id);
+        if (fuIdx !== -1) player.faceUp[fuIdx] = null;
+      }
     } else if (source === 'facedown' || source === 'facedown-reveal') {
       // already removed
     }
@@ -703,6 +744,15 @@ function executeCPUTurn(player) {
 
   // CPU strategy: prefer to play the lowest valid group (unless it has specials)
   const chosen = chooseCPUPlay(playable);
+
+  // Check if the mixed play rule applies: all hand cards same rank + matching face-up
+  const mixedRank = source === 'hand' ? getMixedPlayRank(player) : null;
+  if (mixedRank && chosen[0].rank === mixedRank) {
+    const matchingFaceUp = player.faceUp.filter(c => c && c.rank === mixedRank);
+    playCards(player, [...chosen, ...matchingFaceUp], 'mixed');
+    return;
+  }
+
   playCards(player, chosen, source);
 }
 
@@ -858,12 +908,14 @@ function renderHumanPlayer() {
   const tableRow = document.getElementById('human-table-cards');
   tableRow.innerHTML = '';
   const hasHandCards = player.hand.length > 0;
+  const mixedPlayRank = hasHandCards ? getMixedPlayRank(player) : null;
   for (let i = 0; i < G.tableCount; i++) {
     const fd = player.faceDown[i];
     const fu = player.faceUp[i];
     const stack = document.createElement('div');
     stack.className = 'table-stack';
-    if (hasHandCards) {
+    // Only block this card if it isn't eligible for mixed play
+    if (hasHandCards && !(mixedPlayRank && fu && fu.rank === mixedPlayRank)) {
       stack.addEventListener('click', () => {
         updateStatus('You must play all of the cards in your hand before you can play these cards.');
       });
@@ -887,8 +939,8 @@ function renderHumanPlayer() {
         cardEl.classList.add('faceup-table', 'no-hover');
         cardEl.style.cssText = 'position:absolute;top:0;left:0;';
 
-        // If hand is empty, faceup cards are playable
-        if (player.hand.length === 0 && !G.awaitingHumanFacedown) {
+        // Faceup cards are playable if hand is empty, or if mixed play applies for this rank
+        if ((player.hand.length === 0 || (mixedPlayRank && fu.rank === mixedPlayRank)) && !G.awaitingHumanFacedown) {
           cardEl.classList.remove('no-hover');
           cardEl.classList.remove('faceup-table');
           const isSelected = G.selectedCards.includes(fu.id);
