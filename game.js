@@ -863,13 +863,16 @@ function renderCPUPlayers() {
     handRow.className = 'cpu-hand-row';
     const cpuN = p.hand.length;
     let cpuFanStep = null;
-    if (cpuN > 7) {
-      const cpuCardW = 30, cpuCardH = 42;
+    if (cpuN > 1) {
+      const cpuCardW = 30, cpuCardH = 42, cpuGap = 2;
       const maxW = Math.min(180, window.innerWidth / Math.max(G.players.filter(pl => !pl.isHuman).length, 1) - 30);
-      cpuFanStep = Math.max(6, Math.min(cpuCardW - 5, Math.floor((maxW - cpuCardW) / (cpuN - 1))));
-      handRow.classList.add('fanned');
-      handRow.style.width = (cpuCardW + (cpuN - 1) * cpuFanStep) + 'px';
-      handRow.style.height = cpuCardH + 'px';
+      const naturalW = cpuN * cpuCardW + (cpuN - 1) * cpuGap;
+      if (naturalW > maxW) {
+        cpuFanStep = Math.max(6, Math.min(cpuCardW - 5, Math.floor((maxW - cpuCardW) / (cpuN - 1))));
+        handRow.classList.add('fanned');
+        handRow.style.width = (cpuCardW + (cpuN - 1) * cpuFanStep) + 'px';
+        handRow.style.height = cpuCardH + 'px';
+      }
     }
     p.hand.forEach((_, i) => {
       const back = document.createElement('div');
@@ -975,6 +978,10 @@ function renderHumanPlayer() {
   // Hand
   const handRow = document.getElementById('human-hand');
   handRow.innerHTML = '';
+  handRow.classList.remove('fanned');
+  handRow.classList.remove('hand-crowded');
+  handRow.style.width = '';
+  handRow.style.height = '';
   const source = getPlayerSource(player);
 
   const handLabel = document.getElementById('human-hand-label');
@@ -990,15 +997,19 @@ function renderHumanPlayer() {
   const sortedHand = [...player.hand].sort((a, b) => cardValue(a) - cardValue(b));
   const handN = sortedHand.length;
   let fanStep = null;
-  if (handN > 7) {
+  if (handN > 5) handRow.classList.add('hand-crowded');
+  if (handN > 1) {
     const cardW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w').trim()) || 72;
     const cardH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h').trim()) || 100;
+    const flexGap = 6;
     const maxW = Math.min(340, window.innerWidth - 40);
-    fanStep = Math.max(10, Math.min(cardW - 10, Math.floor((maxW - cardW) / (handN - 1))));
-    handRow.classList.add('fanned');
-    handRow.style.width = (cardW + (handN - 1) * fanStep) + 'px';
-    handRow.style.height = (cardH + 20) + 'px';
-
+    const naturalW = handN * cardW + (handN - 1) * flexGap;
+    if (naturalW > maxW) {
+      fanStep = Math.max(10, Math.min(cardW - 10, Math.floor((maxW - cardW) / (handN - 1))));
+      handRow.classList.add('fanned');
+      handRow.style.width = (cardW + (handN - 1) * fanStep) + 'px';
+      handRow.style.height = (cardH + 20) + 'px';
+    }
   }
 
   sortedHand.forEach((card, i) => {

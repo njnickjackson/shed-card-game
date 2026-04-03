@@ -261,6 +261,7 @@ body {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
+  max-width: 100%;
 }
 
 .cpu-player {
@@ -275,6 +276,8 @@ body {
   border: 2px solid transparent;
   transition: border-color .3s;
   min-width: 200px;
+  max-width: 100%;
+  overflow: hidden;
 }
 .cpu-player.active-turn { border-color: var(--gold); box-shadow: 0 0 12px rgba(244,162,97,.5); }
 .cpu-player.shed-out { opacity: .45; }
@@ -344,6 +347,7 @@ body {
   gap: 8px;
   align-self: center;
   padding: 8px 14px;
+  max-width: 100%;
 }
 
 /* ─── Card Rows ──────────────────────────────────────────────────────────────── */
@@ -352,6 +356,9 @@ body {
   gap: 6px;
   flex-wrap: wrap;
   justify-content: center;
+}
+.hand-row {
+  padding-top: 14px;
 }
 
 /* ─── Cards ──────────────────────────────────────────────────────────────────── */
@@ -382,12 +389,21 @@ body {
   transform: translateY(-10px);
   box-shadow: 0 0 0 3px var(--gold), 0 10px 20px rgba(0,0,0,.4);
 }
+.hand-crowded .card.selected,
+.hand-crowded .card.selected:hover:not(.no-hover) {
+  opacity: 0.75;
+}
 .card.red-suit { color: #d00; }
 .card.cpu-card-mini {
   width: 30px;
   height: 42px;
   font-size: .55rem;
   padding: 2px 3px;
+  border-radius: 4px;
+}
+.card-back.cpu-card-mini {
+  width: 30px;
+  height: 42px;
   border-radius: 4px;
 }
 .card.faceup-table { cursor: default; }
