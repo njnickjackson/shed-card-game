@@ -861,9 +861,24 @@ function renderCPUPlayers() {
 
     const handRow = document.createElement('div');
     handRow.className = 'cpu-hand-row';
-    p.hand.forEach(() => {
+    const cpuN = p.hand.length;
+    let cpuFanStep = null;
+    if (cpuN > 7) {
+      const cpuCardW = 30, cpuCardH = 42;
+      const maxW = Math.min(180, window.innerWidth / Math.max(G.players.filter(pl => !pl.isHuman).length, 1) - 30);
+      cpuFanStep = Math.max(6, Math.min(cpuCardW - 5, Math.floor((maxW - cpuCardW) / (cpuN - 1))));
+      handRow.classList.add('fanned');
+      handRow.style.width = (cpuCardW + (cpuN - 1) * cpuFanStep) + 'px';
+      handRow.style.height = cpuCardH + 'px';
+    }
+    p.hand.forEach((_, i) => {
       const back = document.createElement('div');
       back.className = 'card-back cpu-card-mini';
+      if (cpuFanStep !== null) {
+        back.style.position = 'absolute';
+        back.style.left = (i * cpuFanStep) + 'px';
+        back.style.zIndex = i;
+      }
       handRow.appendChild(back);
     });
     div.appendChild(handRow);
@@ -973,7 +988,20 @@ function renderHumanPlayer() {
   }
 
   const sortedHand = [...player.hand].sort((a, b) => cardValue(a) - cardValue(b));
-  sortedHand.forEach(card => {
+  const handN = sortedHand.length;
+  let fanStep = null;
+  if (handN > 7) {
+    const cardW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w').trim()) || 72;
+    const cardH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h').trim()) || 100;
+    const maxW = Math.min(340, window.innerWidth - 40);
+    fanStep = Math.max(10, Math.min(cardW - 10, Math.floor((maxW - cardW) / (handN - 1))));
+    handRow.classList.add('fanned');
+    handRow.style.width = (cardW + (handN - 1) * fanStep) + 'px';
+    handRow.style.height = (cardH + 20) + 'px';
+
+  }
+
+  sortedHand.forEach((card, i) => {
     const el = buildCardEl(card);
     const isSelected = G.selectedCards.includes(card.id);
     if (isSelected) el.classList.add('selected');
@@ -982,6 +1010,11 @@ function renderHumanPlayer() {
       el.addEventListener('click', () => onCardClick(card.id, 'hand', null));
     } else {
       el.classList.add('no-hover');
+    }
+    if (fanStep !== null) {
+      el.style.position = 'absolute';
+      el.style.left = (i * fanStep) + 'px';
+      el.style.zIndex = i;
     }
     handRow.appendChild(el);
   });

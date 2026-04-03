@@ -344,6 +344,19 @@ body {
   top: 0; left: 0;
 }
 
+/* Fanned hand layout (> 5 cards) */
+.hand-row.fanned,
+.cpu-hand-row.fanned {
+  position: relative;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  margin: 0 auto;
+}
+.hand-row.fanned .card:hover:not(.no-hover),
+.hand-row.fanned .card.selected {
+  z-index: 50 !important;
+}
+
 /* Hand label */
 .hand-label {
   font-size: .7rem;
