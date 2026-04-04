@@ -22,28 +22,27 @@
   <div id="screen-rules" class="screen">
     <div class="rules-content">
       <button id="btn-rules-back" class="btn-rules-back">← Back</button>
-      <h2 class="rules-title">House Rules</h2>
+      <h2 class="rules-title">Rules of Shed</h2>
       <div class="rules-body">
 
         <section class="rules-section">
           <h3>Objective</h3>
-          <p>Be one of the first players to get rid of all your cards. The last player holding cards becomes <strong>the Shed</strong> — the loser.</p>
+          <p>Get rid of all your cards. The last player holding cards becomes <strong>the Shed</strong> — the loser.</p>
         </section>
 
         <section class="rules-section">
           <h3>Setup</h3>
           <ul>
-            <li>Each player receives <strong>3 face-down table cards</strong> (you may not look at these), <strong>3 face-up table cards</strong> placed on top of them, and <strong>3 hand cards</strong>.</li>
-            <li>With 2 players, you get <strong>4 table cards</strong> each instead of 3.</li>
-            <li>Before play begins, you may swap any cards between your hand and your face-up table cards to set yourself up. When ready, the game starts.</li>
-            <li>The player holding the lowest non-special card (starting from 3) goes first. Ties broken by suit: clubs &lt; spades &lt; diamonds &lt; hearts.</li>
+            <li>For games of 3-6 players, each player starts with <strong>3 face-down cards</strong> (you may not look at these), <strong>3 face-up cards</strong> placed on top of them, and <strong>3 cards to keep in hand</strong>.</li>
+            <li>For a 2-player game, the same rules apply, but each player starts with <strong>4 face-down and 4 face-up cards</strong> instead of 3.</li>
+            <li>The player holding the lowest card (starting from 3) goes first. Ties for cards of the same rank are broken alphabetically. Black cards go before red. If two cards are the same rank and color, ties are further broken alphabetically by suit. (ex. clubs go before spades)</li>
           </ul>
         </section>
 
         <section class="rules-section">
           <h3>Taking Your Turn</h3>
           <ul>
-            <li>Play one or more cards of the <strong>same rank</strong> onto the pile. The rank must be equal to or higher than the top card of the pile (unless a special rule applies).</li>
+            <li>Play one or more cards of the <strong>same rank</strong> onto the pile. The rank must be equal to or higher than the top card of the pile (unless a 7 is played - see Special Cards below).</li>
             <li>If you cannot play, you must <strong>pick up the entire pile</strong> and add it to your hand.</li>
             <li>After playing from your hand, draw back up to 3 cards while the draw pile lasts.</li>
           </ul>
@@ -54,8 +53,8 @@
           <p>You must exhaust each phase before moving to the next:</p>
           <ol>
             <li><strong>Hand</strong> — play from the cards in your hand.</li>
-            <li><strong>Face-Up Table</strong> — once your hand is empty, play your visible table cards.</li>
-            <li><strong>Face-Down Table</strong> — flip one card at a time. If it plays, great. If not, pick up the pile and the flipped card.</li>
+            <li><strong>Face-Up</strong> — once your hand is empty, play your face-up cards.</li>
+            <li><strong>Face-Down</strong> — flip one card at a time. If it plays, great. If not, pick up the pile and the flipped card.</li>
           </ol>
         </section>
 
@@ -65,22 +64,17 @@
             <thead><tr><th>Card</th><th>Effect</th></tr></thead>
             <tbody>
               <tr><td>2</td><td>Wild — can be played on any card. Resets the pile; next player can play anything.</td></tr>
-              <tr><td>7</td><td>Low cap — the next player must play a 7 or lower (or another special card).</td></tr>
-              <tr><td>8</td><td>Skip — skips the next player. Playing multiple 8s skips multiple players.</td></tr>
-              <tr><td>10</td><td>Burn — clears the entire pile immediately. The same player plays again.</td></tr>
-              <tr><td>Joker</td><td>Reversal — reverses the direction of play. Always playable on any card. (6-player games only.)</td></tr>
+              <tr><td>7</td><td>Low cap — the next player must play a 7 or lower.</td></tr>
+              <tr><td>8</td><td>Skip — skips the next player.</td></tr>
+              <tr><td>10</td><td>Wild + Burn — can be played on any card and clears the entire pile immediately. The same player plays again.</td></tr>
+              <tr><td>Joker</td><td>Reversal — reverses the direction of play. Always playable on any card. Any card can also be played on the Joker. (6-player games only)</td></tr>
             </tbody>
           </table>
         </section>
 
         <section class="rules-section">
           <h3>Four of a Kind Burn</h3>
-          <p>If the top four cards of the pile share the same rank — whether played at once or built up over multiple turns — the pile <strong>burns automatically</strong>. The player who triggered it plays again.</p>
-        </section>
-
-        <section class="rules-section">
-          <h3>Mixed Play</h3>
-          <p>Once the draw pile is gone, if you have matching cards in both your hand and your face-up table cards, you may play them all together in a single move.</p>
+          <p>If the top four cards of the pile share the same rank — whether played at once or built up over multiple turns — the pile <strong>burns automatically</strong>. The player who burned it plays again.</p>
         </section>
 
       </div>
