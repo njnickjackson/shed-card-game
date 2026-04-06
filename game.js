@@ -237,7 +237,7 @@ function initGame(numPlayers) {
 
 function startSetupPhase() {
   G.selectedCards = [];
-  document.getElementById('btn-play').textContent = 'Place Face Up';
+  document.getElementById('btn-play').textContent = 'Place Face-Up Cards';
   document.getElementById('btn-play').disabled = true;
   setPickupButton(false);
   document.getElementById('btn-confirm-facedown').classList.add('hidden');
@@ -261,7 +261,7 @@ function onSetupCardClick(cardId, source) {
   if (remaining > 0) {
     updateStatus(`Select ${remaining} more card${remaining !== 1 ? 's' : ''} to place face-up.`);
   } else {
-    updateStatus(`Ready! Click "Place Face Up" to confirm.`);
+    updateStatus(`Ready! Click "Place Face-Up Cards" to confirm.`);
   }
   document.getElementById('btn-play').disabled = G.selectedCards.length !== G.tableCount;
   document.querySelectorAll('.card[data-id]').forEach(el => {
