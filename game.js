@@ -639,9 +639,10 @@ function playCards(player, cards, source) {
 
   // Check for four-of-a-kind burn
   if (checkFourOfAKind()) {
+    const burnedRank = G.pile[G.pile.length - 1].rank;
     showBurnAnimation();
-    updatePrevTurn(`${player.name} completed four of a kind and burned the pile.`);
-    updateStatus(`Four of a kind! Pile burned! ${player.name} plays again.`);
+    updatePrevTurn(`${player.name} completed four ${burnedRank}s and burned the pile.`);
+    updateStatus(`Four ${burnedRank}s! Pile burned! ${player.name} plays again.`);
     setTimeout(() => {
       burnPile();
       drawBackUp(player);
