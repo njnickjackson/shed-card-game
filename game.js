@@ -457,6 +457,14 @@ function onCardClick(cardId, source, slotIdx) {
     }
     if (canPlay(card) || isJoker(card)) {
       G.selectedCards.push(cardId);
+      // Auto-select all other hand cards of the same rank (except 2s and 10s)
+      if (source === 'hand' && card.rank !== '2' && card.rank !== '10') {
+        player.hand.forEach(c => {
+          if (c.id !== cardId && c.rank === card.rank && !G.selectedCards.includes(c.id)) {
+            G.selectedCards.push(c.id);
+          }
+        });
+      }
     } else {
       updateStatus(`Can't play that card right now.`);
     }
