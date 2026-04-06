@@ -641,9 +641,11 @@ function playCards(player, cards, source) {
   // Handle 8 (skip)
   let skipCount = 1;
   if (cards[0].rank === '8') {
-    skipCount = 1 + cards.length; // 1 normal advance + extra skips
-    updatePrevTurn(`${player.name} played ${cards.length > 1 ? cards.length + ' eights' : 'an 8'} and skipped ${cards.length} player${cards.length > 1 ? 's' : ''}.`);
-    updateStatus(`${player.name} played ${cards.length} eight(s) – skip ${cards.length} player(s)!`);
+    const activePlayers = G.players.filter(p => !p.out).length;
+    const skips = Math.min(cards.length, activePlayers - 1);
+    skipCount = skips + 1;
+    updatePrevTurn(`${player.name} played ${cards.length > 1 ? cards.length + ' eights' : 'an 8'} and skipped ${skips} player${skips !== 1 ? 's' : ''}.`);
+    updateStatus(`${player.name} played ${cards.length} eight(s) – skip ${skips} player${skips !== 1 ? 's' : ''}!`);
   } else {
     updatePrevTurn(`${player.name} played ${rankStr}.`);
   }
