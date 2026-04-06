@@ -617,24 +617,29 @@ function playCards(player, cards, source) {
 
   // Handle 10 (burn)
   if (cards[0].rank === '10') {
-    burnPile();
-    drawBackUp(player);
-    renderGame();
+    showBurnAnimation();
     updatePrevTurn(`${player.name} played a 10 and burned the pile.`);
     updateStatus(`${player.name} played a 10 – pile burned! Play again.`);
-    // Same player goes again
-    setTimeout(nextTurn, CPU_DELAY);
+    setTimeout(() => {
+      burnPile();
+      drawBackUp(player);
+      renderGame();
+      setTimeout(nextTurn, CPU_DELAY);
+    }, BURN_ANIM_MS);
     return;
   }
 
   // Check for four-of-a-kind burn
   if (checkFourOfAKind()) {
-    burnPile();
-    drawBackUp(player);
-    renderGame();
+    showBurnAnimation();
     updatePrevTurn(`${player.name} completed four of a kind and burned the pile.`);
     updateStatus(`Four of a kind! Pile burned! ${player.name} plays again.`);
-    setTimeout(nextTurn, CPU_DELAY);
+    setTimeout(() => {
+      burnPile();
+      drawBackUp(player);
+      renderGame();
+      setTimeout(nextTurn, CPU_DELAY);
+    }, BURN_ANIM_MS);
     return;
   }
 
@@ -675,6 +680,141 @@ function drawBackUp(player) {
 function burnPile() {
   G.pile = [];
   logMsg('Pile burned!');
+}
+
+const BURN_ANIM_MS = 400;
+
+function showBurnAnimation() {
+  const pileEl = document.getElementById('play-pile');
+  const rect   = pileEl.getBoundingClientRect();
+
+  const W  = Math.round(rect.width);
+  const H  = Math.round(rect.height);
+  const cx = W / 2;
+  const cy = H / 2;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = W;
+  canvas.height = H;
+  canvas.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${W}px;height:${H}px;pointer-events:none;z-index:9999;`;
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+
+  // ── Ember particles – shoot outward from center ───────────────────────────────
+  const embers = Array.from({ length: 28 }, () => {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 0.8 + Math.random() * 2.5;
+    return {
+      x: cx, y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      size:    1.5 + Math.random() * 2.5,
+      warm:    Math.random() < 0.6,   // true = yellow, false = orange
+      maxLife: 18 + Math.floor(Math.random() * 14),
+      life:    Math.floor(Math.random() * 4),  // stagger starts
+    };
+  });
+
+  // ── Smoke / debris puffs – expand outward and drift up ───────────────────────
+  const puffs = Array.from({ length: 10 }, () => {
+    const angle = Math.random() * Math.PI * 2;
+    const dist  = 5 + Math.random() * 15;
+    return {
+      x:       cx + Math.cos(angle) * dist,
+      y:       cy + Math.sin(angle) * dist,
+      vx:      Math.cos(angle) * (0.4 + Math.random() * 0.6),
+      vy:      Math.sin(angle) * (0.4 + Math.random() * 0.6) - 0.4,
+      radius:  6 + Math.random() * 10,
+      maxLife: 28 + Math.floor(Math.random() * 18),
+      life:    0,
+    };
+  });
+
+  const DURATION = 800;
+
+  function frame(ts) {
+    if (!frame.t0) { frame.t0 = ts; requestAnimationFrame(frame); return; }
+    const elapsed = ts - frame.t0;
+    const t = Math.min(1, elapsed / DURATION);   // 0 → 1 over full duration
+
+    ctx.clearRect(0, 0, W, H);
+
+    // ── Outer smoke cloud (brown/orange, expands and fades) ───────────────────
+    const smokeR = Math.min(W, H) * 0.72 * Math.min(1, t * 2.5);
+    if (smokeR > 0) {
+      const smokeAlpha = t < 0.4 ? t / 0.4 : 1 - (t - 0.4) / 0.6;
+      const sg = ctx.createRadialGradient(cx, cy, smokeR * 0.2, cx, cy, smokeR);
+      sg.addColorStop(0,   `rgba(180, 100, 15, ${smokeAlpha * 0.55})`);
+      sg.addColorStop(0.5, `rgba(130,  70, 10, ${smokeAlpha * 0.35})`);
+      sg.addColorStop(1,   `rgba( 60,  35,  5, 0)`);
+      ctx.beginPath();
+      ctx.arc(cx, cy, smokeR, 0, Math.PI * 2);
+      ctx.fillStyle = sg;
+      ctx.fill();
+    }
+
+    // ── Main fireball (bright center, orange body, fades after peak) ──────────
+    const fireT   = t < 0.35 ? t / 0.35 : 1 - (t - 0.35) / 0.65;
+    const fireR   = Math.min(W, H) * 0.52 * Math.min(1, t * 3);
+    if (fireR > 0 && fireT > 0) {
+      const fg = ctx.createRadialGradient(cx, cy, 0, cx, cy, fireR);
+      fg.addColorStop(0,    `rgba(255, 255, 210, ${fireT * 0.95})`);
+      fg.addColorStop(0.18, `rgba(255, 230,   0, ${fireT * 0.92})`);
+      fg.addColorStop(0.45, `rgba(255, 120,   0, ${fireT * 0.85})`);
+      fg.addColorStop(0.75, `rgba(200,  55,   0, ${fireT * 0.6})`);
+      fg.addColorStop(1,    `rgba(140,  25,   0, 0)`);
+      ctx.beginPath();
+      ctx.arc(cx, cy, fireR, 0, Math.PI * 2);
+      ctx.fillStyle = fg;
+      ctx.fill();
+    }
+
+    // ── Ember particles ───────────────────────────────────────────────────────
+    embers.forEach(p => {
+      if (p.life >= p.maxLife) return;
+      p.life++;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.06;  // slight gravity
+      const pt    = p.life / p.maxLife;
+      const alpha = (1 - pt) * 0.9;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * (1 - pt * 0.4), 0, Math.PI * 2);
+      ctx.fillStyle = p.warm
+        ? `rgba(255, 220, 60, ${alpha})`
+        : `rgba(255, 110,  0, ${alpha})`;
+      ctx.fill();
+    });
+
+    // ── Smoke / debris puffs ──────────────────────────────────────────────────
+    puffs.forEach(p => {
+      if (p.life >= p.maxLife) return;
+      p.life++;
+      p.x      += p.vx;
+      p.y      += p.vy;
+      p.radius += 0.6;
+      p.vx     *= 0.97;
+      p.vy     *= 0.97;
+      const pt    = p.life / p.maxLife;
+      const alpha = (pt < 0.2 ? pt / 0.2 : 1 - pt) * 0.55;
+      const pg    = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+      pg.addColorStop(0, `rgba(110, 70, 20, ${alpha})`);
+      pg.addColorStop(1, `rgba( 60, 35, 10, 0)`);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = pg;
+      ctx.fill();
+    });
+
+    if (elapsed < DURATION + 50) {
+      requestAnimationFrame(frame);
+    } else {
+      canvas.remove();
+    }
+  }
+
+  requestAnimationFrame(frame);
 }
 
 function checkFourOfAKind() {
