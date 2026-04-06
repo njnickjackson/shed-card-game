@@ -210,6 +210,7 @@ function initGame(numPlayers) {
     tableCount: exactCount === 2 ? 4 : 3,
     selectedCards: [],
     awaitingHumanFacedown: false,
+    awaitingFaceUpPickup: false,
     humanIdx: 0,
     log: [],
   };
@@ -388,6 +389,7 @@ function advanceTurn(skipCount = 1) {
 function startHumanTurn() {
   G.selectedCards = [];
   G.awaitingHumanFacedown = false;
+  G.awaitingFaceUpPickup = false;
 
   const player = currentPlayer();
   if (player.out) return;
@@ -433,6 +435,11 @@ function onCardClick(cardId, source, slotIdx) {
   }
   const player = currentPlayer();
   if (!player.isHuman) return;
+
+  if (G.awaitingFaceUpPickup && source === 'faceup') {
+    pickupFaceUpCard(player, cardId);
+    return;
+  }
 
   if (G.awaitingHumanFacedown && source === 'facedown') {
     // Flip facedown card
@@ -543,12 +550,52 @@ function onPickupPile() {
     return;
   }
   const player = currentPlayer();
+  const source = getPlayerSource(player);
+
   player.hand.push(...G.pile);
   G.pile = [];
+  G.selectedCards = [];
+
+  if (source === 'faceup') {
+    // In the face-up phase the player must also take one face-up card into hand
+    G.awaitingFaceUpPickup = true;
+    setPlayButton(false);
+    setPickupButton(false);
+    logMsg(`${player.name} picked up the pile.`);
+    updateStatus("Now pick a face-up card to take into your hand.");
+    renderGame();
+    return;
+  }
+
   logMsg(`${player.name} picked up the pile.`);
   updatePrevTurn(`You picked up the pile.`);
   updateStatus("You picked up the pile.");
-  G.selectedCards = [];
+  renderGame();
+  advanceTurn();
+}
+
+function pickupFaceUpCard(player, cardId) {
+  const card = player.faceUp.find(c => c && c.id === cardId);
+  if (!card) return;
+
+  // Take this card and all face-up cards of the same rank
+  const taken = [];
+  for (let i = 0; i < player.faceUp.length; i++) {
+    if (player.faceUp[i] && player.faceUp[i].rank === card.rank) {
+      taken.push(player.faceUp[i]);
+      player.faceUp[i] = null;
+    }
+  }
+  player.hand.push(...taken);
+
+  const desc = taken.length === 1
+    ? displayCard(taken[0])
+    : `${taken.length} ${card.rank}s`;
+  logMsg(`${player.name} picked up ${desc} from the table.`);
+  updatePrevTurn(`You picked up the pile and ${desc} from the table.`);
+  updateStatus(`Picked up ${desc} from the table.`);
+
+  G.awaitingFaceUpPickup = false;
   renderGame();
   advanceTurn();
 }
@@ -885,9 +932,35 @@ function executeCPUTurn(player) {
     // Must pick up pile
     player.hand.push(...G.pile);
     G.pile = [];
-    logMsg(`${player.name} picks up the pile.`);
-    updatePrevTurn(`${player.name} picked up the pile.`);
-    updateStatus(`${player.name} picks up the pile.`);
+
+    // In face-up phase, also pick up a face-up card (first available + same-rank duplicates)
+    if (source === 'faceup') {
+      const faceUpCards = player.faceUp.filter(Boolean);
+      if (faceUpCards.length > 0) {
+        const rank = faceUpCards[0].rank;
+        const taken = [];
+        for (let i = 0; i < player.faceUp.length; i++) {
+          if (player.faceUp[i] && player.faceUp[i].rank === rank) {
+            taken.push(player.faceUp[i]);
+            player.faceUp[i] = null;
+          }
+        }
+        player.hand.push(...taken);
+        const desc = taken.length === 1 ? displayCard(taken[0]) : `${taken.length} ${rank}s`;
+        logMsg(`${player.name} picks up the pile and ${desc} from the table.`);
+        updatePrevTurn(`${player.name} picked up the pile and ${desc} from the table.`);
+        updateStatus(`${player.name} picks up the pile and ${desc} from the table.`);
+      } else {
+        logMsg(`${player.name} picks up the pile.`);
+        updatePrevTurn(`${player.name} picked up the pile.`);
+        updateStatus(`${player.name} picks up the pile.`);
+      }
+    } else {
+      logMsg(`${player.name} picks up the pile.`);
+      updatePrevTurn(`${player.name} picked up the pile.`);
+      updateStatus(`${player.name} picks up the pile.`);
+    }
+
     renderGame();
     advanceTurn();
     return;
@@ -1108,8 +1181,9 @@ function renderHumanPlayer() {
         cardEl.classList.add('faceup-table', 'no-hover');
         cardEl.style.cssText = 'position:absolute;top:0;left:0;';
 
-        // Faceup cards are playable if hand is empty, or if mixed play applies for this rank
-        if ((player.hand.length === 0 || (mixedPlayRank && fu.rank === mixedPlayRank)) && !G.awaitingHumanFacedown) {
+        // Faceup cards are playable if hand is empty, or if mixed play applies for this rank,
+        // or if we're waiting for the player to pick one up after taking the pile
+        if ((player.hand.length === 0 || G.awaitingFaceUpPickup || (mixedPlayRank && fu.rank === mixedPlayRank)) && !G.awaitingHumanFacedown) {
           cardEl.classList.remove('no-hover');
           cardEl.classList.remove('faceup-table');
           const isSelected = G.selectedCards.includes(fu.id);
