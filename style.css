@@ -304,6 +304,7 @@ body {
   justify-content: center;
   gap: 30px;
   flex-shrink: 0;
+  padding-bottom: 16px;
 }
 #draw-pile-area, #play-pile-area {
   display: flex;
