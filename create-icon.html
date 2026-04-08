@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Generate App Icon</title>
+  <style>
+    body { background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; font-family: sans-serif; color: white; gap: 20px; }
+    canvas { border-radius: 40px; box-shadow: 0 8px 40px rgba(0,0,0,.6); }
+    button { padding: 12px 28px; background: #f4a261; color: #1a1a1a; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button:hover { background: #e08a4a; }
+    p { color: rgba(255,255,255,.6); font-size: 14px; margin: 0; }
+  </style>
+</head>
+<body>
+  <canvas id="icon" width="180" height="180"></canvas>
+  <button onclick="download()">Download apple-touch-icon.png</button>
+  <p>Save the downloaded file to your shed-card-game project folder, then refresh the app.</p>
+
+  <script>
+    const canvas = document.getElementById('icon');
+    const ctx = canvas.getContext('2d');
+
+    // Background — felt green
+    ctx.fillStyle = '#1b4332';
+    roundRect(ctx, 0, 0, 180, 180, 0);
+    ctx.fill();
+
+    // Playing card — white
+    ctx.fillStyle = '#f8f9fa';
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, 28, 18, 124, 144, 14);
+    ctx.fill();
+    ctx.stroke();
+
+    // Shed drawing — centered on card (card center x=90, shed center y=90)
+    // Shed spans y=54 to y=126, center=90; between top S (~y=48) and bottom S (~y=134)
+    ctx.strokeStyle = '#1b4332';
+    ctx.lineWidth = 4;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
+    // Roof (symmetric triangle centered at x=90)
+    ctx.beginPath();
+    ctx.moveTo(50, 88);
+    ctx.lineTo(90, 54);
+    ctx.lineTo(130, 88);
+    ctx.closePath();
+    ctx.stroke();
+
+    // Chimney — clear roof line behind it, then draw 3 sides
+    ctx.fillStyle = '#f8f9fa';
+    ctx.fillRect(101, 56, 14, 32);  // erase roof line under chimney
+    ctx.strokeStyle = '#1b4332';
+    ctx.beginPath();
+    ctx.moveTo(101, 88);  // bottom-left (meets body top)
+    ctx.lineTo(101, 56);  // top-left
+    ctx.lineTo(115, 56);  // top-right
+    ctx.lineTo(115, 88);  // bottom-right
+    ctx.stroke();
+
+    // Body — x=60 to x=120 (w=60), y=88 to y=126 (h=38)
+    ctx.strokeRect(60, 88, 60, 38);
+
+    // Window — left side of body
+    ctx.strokeRect(66, 96, 16, 13);
+
+    // Door — right side of body, flush with bottom
+    ctx.beginPath();
+    roundRect(ctx, 96, 100, 17, 26, 3);
+    ctx.stroke();
+
+    // Rank "S" — top left
+    ctx.fillStyle = '#1b4332';
+    ctx.font = 'bold 20px Georgia, serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText('S', 36, 26);
+
+    // Rank "S" — bottom right (same orientation, mirrored position)
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('S', 144, 154);
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function download() {
+      const a = document.createElement('a');
+      a.download = 'apple-touch-icon.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    }
+  </script>
+</body>
+</html>
