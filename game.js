@@ -176,7 +176,7 @@ function dealGame(numPlayers) {
 function determineFirstPlayer() {
   // Find who has the lowest non-wild non-joker card across all hands
   // Start from rank 3, then 4, etc.
-  const rankOrder = ['3','4','5','6','7','8','9','10','J','Q','K','A'];
+  const rankOrder = ['3','4','5','6','7','8','9','J','Q','K','A']; // exclude 2 and 10 (wilds)
 
   for (const rank of rankOrder) {
     let candidates = [];
@@ -212,6 +212,7 @@ function initGame(numPlayers) {
     awaitingHumanFacedown: false,
     awaitingFaceUpPickup: false,
     humanIdx: 0,
+    openingCardId: null,
     log: [],
   };
 
@@ -222,13 +223,6 @@ function initGame(numPlayers) {
   }
 
   dealGame(exactCount);
-
-  // Determine first player
-  const firstResult = determineFirstPlayer();
-  G.currentPlayerIdx = G.players.findIndex(p => p.id === firstResult.playerId);
-
-  // Store first player info for after setup completes
-  G.setupFirstResult = firstResult;
 
   renderGame();
   startSetupPhase();
@@ -282,13 +276,17 @@ function confirmSetupSelection() {
 
   document.getElementById('btn-play').textContent = 'Play Selected';
 
+  // Determine first player now that all hands are finalised (3 cards each)
+  const firstResult = determineFirstPlayer();
+  G.currentPlayerIdx = G.players.findIndex(p => p.id === firstResult.playerId);
+  if (firstResult.card) G.openingCardId = firstResult.card.id;
+
   G.phase = 'hand';
 
-  const firstResult = G.setupFirstResult;
   const firstPlayer = G.players[G.currentPlayerIdx];
   const startCard = firstResult.card ? ` the ${displayCard(firstResult.card)}` : '';
   updatePrevTurn(firstPlayer.isHuman
-    ? `Game start – you have the lowest card, ${startCard}. You go first.`
+    ? `Game start – you have the lowest card, ${startCard}. You must play it first.`
     : `Game start – ${firstPlayer.name} had the lowest card and started with ${startCard}.`);
   updateStatus(`${firstPlayer.name}'s turn first.`);
 
@@ -523,6 +521,12 @@ function onPlaySelected() {
     return;
   }
 
+  if (G.openingCardId && !cards.some(c => c.id === G.openingCardId)) {
+    const opener = findCardById(player, G.openingCardId);
+    updateStatus(`You must play your lowest card first${opener ? ' (' + displayCard(opener) + ')' : ''}.`);
+    return;
+  }
+
   // Detect mixed play: hand + face-up cards played together
   let effectiveSource = source;
   if (source === 'hand') {
@@ -538,6 +542,7 @@ function onPlaySelected() {
   }
 
   G.selectedCards = [];
+  G.openingCardId = null;
   setPlayButton(false);
   setPickupButton(false);
 
@@ -899,6 +904,17 @@ function startCPUTurn() {
 
 function executeCPUTurn(player) {
   const source = getPlayerSource(player);
+
+  // First turn: CPU must play the required opening card
+  if (G.openingCardId && source === 'hand') {
+    const opener = player.hand.find(c => c.id === G.openingCardId);
+    G.openingCardId = null;
+    if (opener) {
+      const toPlay = player.hand.filter(c => c.rank === opener.rank);
+      playCards(player, toPlay, 'hand');
+      return;
+    }
+  }
 
   if (source === 'facedown') {
     // Must flip a random facedown card
