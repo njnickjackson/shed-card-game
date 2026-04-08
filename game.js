@@ -1008,7 +1008,7 @@ function getPlayableGroups(cards) {
 }
 
 function chooseCPUPlay(groups) {
-  // Priority: 10 (burns) > match pile rank > lowest playable > wild 2
+  // Priority: four-of-a-kind completion > lowest normal card > wild 2 > 10 (last resort)
   const top = effectiveTopCard();
 
   // Check for four-of-a-kind completion
@@ -1019,19 +1019,23 @@ function chooseCPUPlay(groups) {
     if (matching && topInPile + matching.length >= 4) return matching;
   }
 
-  // Prefer 10 (burn)
+  // Prefer normal cards (not 2, not 10, not joker) — save wilds for when needed
+  const normal = groups.filter(g => g[0].rank !== '2' && g[0].rank !== '10' && !isJoker(g[0]));
+  if (normal.length > 0) {
+    normal.sort((a, b) => cardValue(a[0]) - cardValue(b[0]));
+    return normal[0];
+  }
+
+  // Fall back to wild 2 before using a 10
+  const two = groups.find(g => g[0].rank === '2');
+  if (two) return two;
+
+  // 10 is a last resort
   const ten = groups.find(g => g[0].rank === '10');
   if (ten) return ten;
 
-  // Avoid playing 2 unless necessary (it's a useful wild)
-  const nonWild = groups.filter(g => g[0].rank !== '2' && !isJoker(g[0]));
-  const pool = nonWild.length > 0 ? nonWild : groups;
-
-  // Sort by value ascending – play lowest valid card to save high cards
-  pool.sort((a, b) => cardValue(a[0]) - cardValue(b[0]));
-
-  // Play biggest group of the lowest rank (play all matching)
-  return pool[0];
+  // Final fallback (joker etc.)
+  return groups[0];
 }
 
 // ── Rendering ─────────────────────────────────────────────────────────────────
