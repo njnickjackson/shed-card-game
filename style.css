@@ -254,6 +254,11 @@ body {
   gap: 8px;
   overflow: hidden;
 }
+#game-layout::before,
+#game-layout::after {
+  content: '';
+  flex: 1;
+}
 
 /* ─── CPU Area ───────────────────────────────────────────────────────────────── */
 #cpu-area {
