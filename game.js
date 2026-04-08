@@ -523,7 +523,7 @@ function onPlaySelected() {
 
   if (G.openingCardId && !cards.some(c => c.id === G.openingCardId)) {
     const opener = findCardById(player, G.openingCardId);
-    updateStatus(`You must play your lowest card first${opener ? ' (' + displayCard(opener) + ')' : ''}.`);
+    updateStatus(`You must start the game with your lowest card first${opener ? ' (' + displayCard(opener) + ')' : ''}.`);
     return;
   }
 
