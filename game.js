@@ -286,7 +286,7 @@ function confirmSetupSelection() {
   const firstPlayer = G.players[G.currentPlayerIdx];
   const startCard = firstResult.card ? ` the ${displayCard(firstResult.card)}` : '';
   updatePrevTurn(firstPlayer.isHuman
-    ? `Game start – you have the lowest card, ${startCard}. You must play it first.`
+    ? `Game start – you have the lowest card, ${startCard}. You go first.`
     : `Game start – ${firstPlayer.name} had the lowest card and started with ${startCard}.`);
   updateStatus(`${firstPlayer.name}'s turn first.`);
 
@@ -1299,10 +1299,7 @@ function buildCardEl(card) {
   return el;
 }
 
-function updateDirectionIndicator() {
-  const el = document.getElementById('direction-indicator');
-  el.textContent = G.direction === 1 ? '↻' : '↺';
-}
+function updateDirectionIndicator() {}
 
 function highlightCurrentPlayer() {
   document.querySelectorAll('.cpu-player').forEach(el => el.classList.remove('active-turn'));
