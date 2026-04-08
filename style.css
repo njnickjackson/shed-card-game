@@ -384,7 +384,9 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,.35);
   flex-shrink: 0;
 }
-.card:hover:not(.no-hover) { transform: translateY(-6px); box-shadow: 0 8px 16px rgba(0,0,0,.4); }
+@media (hover: hover) {
+  .card:hover:not(.no-hover) { transform: translateY(-6px); box-shadow: 0 8px 16px rgba(0,0,0,.4); }
+}
 .card.selected,
 .card.selected:hover:not(.no-hover) {
   transform: translateY(-10px);
@@ -474,9 +476,9 @@ body {
   justify-content: flex-start;
   margin: 0 auto;
 }
-.hand-row.fanned .card:hover:not(.no-hover),
-.hand-row.fanned .card.selected {
-  z-index: 50 !important;
+.hand-row.fanned .card.selected { z-index: 50 !important; }
+@media (hover: hover) {
+  .hand-row.fanned .card:hover:not(.no-hover) { z-index: 50 !important; }
 }
 
 /* Hand label */

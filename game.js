@@ -1351,7 +1351,7 @@ function showScreen(id) {
 // ── Event Listeners ───────────────────────────────────────────────────────────
 
 function isMobile() {
-  return window.matchMedia('(pointer: coarse)').matches && window.innerWidth <= 768;
+  return navigator.maxTouchPoints > 0;
 }
 
 document.getElementById('btn-rules').addEventListener('click', () => {
