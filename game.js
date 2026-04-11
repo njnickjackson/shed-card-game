@@ -1355,6 +1355,9 @@ function displayCard(card) {
 
 function showModal(msg) {
   document.getElementById('modal-msg').textContent = msg;
+  const isOver = G.phase === 'over';
+  document.getElementById('modal-ok').classList.toggle('hidden', isOver);
+  document.getElementById('modal-play-again').classList.toggle('hidden', !isOver);
   document.getElementById('modal').classList.remove('hidden');
 }
 
@@ -1415,12 +1418,16 @@ document.getElementById('btn-confirm-facedown').addEventListener('click', () => 
 
 document.getElementById('modal-ok').addEventListener('click', () => {
   document.getElementById('modal').classList.add('hidden');
-  if (G.phase === 'over') {
-    // Offer restart
-    if (confirm('Play again?')) {
-      showScreen('screen-start');
-    }
-  }
+});
+
+document.getElementById('modal-yes').addEventListener('click', () => {
+  document.getElementById('modal').classList.add('hidden');
+  startNewGame(G.numPlayers);
+});
+
+document.getElementById('modal-no').addEventListener('click', () => {
+  document.getElementById('modal').classList.add('hidden');
+  showScreen('screen-start');
 });
 
 function startNewGame(numPlayers) {
