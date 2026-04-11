@@ -1425,5 +1425,8 @@ document.getElementById('modal-ok').addEventListener('click', () => {
 
 function startNewGame(numPlayers) {
   showScreen('screen-game');
+  document.getElementById('prev-turn-msg').textContent = '';
+  document.getElementById('curr-turn-msg').textContent = '';
+  document.getElementById('status-msg').textContent = '';
   initGame(numPlayers);
 }
