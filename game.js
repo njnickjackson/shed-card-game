@@ -1430,6 +1430,18 @@ document.getElementById('modal-no').addEventListener('click', () => {
   showScreen('screen-start');
 });
 
+document.getElementById('btn-in-game-rules').addEventListener('click', () => {
+  document.getElementById('in-game-rules-overlay').classList.remove('hidden');
+});
+document.getElementById('btn-close-in-game-rules').addEventListener('click', () => {
+  document.getElementById('in-game-rules-overlay').classList.add('hidden');
+});
+document.getElementById('in-game-rules-overlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) {
+    e.currentTarget.classList.add('hidden');
+  }
+});
+
 function startNewGame(numPlayers) {
   showScreen('screen-game');
   document.getElementById('prev-turn-msg').textContent = '';

@@ -243,6 +243,7 @@ body {
   overflow: hidden;
   align-items: stretch;
   justify-content: flex-start;
+  position: relative;
 }
 #screen-game.active { display: flex; }
 
@@ -572,6 +573,71 @@ body {
 }
 .play-again-btns .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.4); }
 .play-again-btns .btn-secondary:active { transform: translateY(0); }
+
+/* ─── In-Game Rules Button ───────────────────────────────────────────────────── */
+.btn-in-game-rules {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.25);
+  color: rgba(255,255,255,.7);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 100;
+  transition: background .15s, color .15s;
+  line-height: 1;
+}
+.btn-in-game-rules:hover {
+  background: rgba(255,255,255,.22);
+  color: var(--white);
+}
+
+/* ─── In-Game Rules Overlay ──────────────────────────────────────────────────── */
+.in-game-rules-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn .2s ease;
+}
+.in-game-rules-overlay.hidden { display: none !important; }
+
+.in-game-rules-panel {
+  position: relative;
+  width: min(680px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--felt);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px;
+  padding: 2rem 2.5rem 3rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--felt-mid) transparent;
+}
+.in-game-rules-panel::-webkit-scrollbar { width: 6px; }
+.in-game-rules-panel::-webkit-scrollbar-thumb { background: var(--felt-mid); border-radius: 3px; }
+
+.btn-close-in-game-rules {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.5);
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color .15s;
+}
+.btn-close-in-game-rules:hover { color: var(--white); }
 
 /* ─── Animations ─────────────────────────────────────────────────────────────── */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
