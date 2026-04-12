@@ -361,7 +361,10 @@ function checkGameOver() {
     G.phase = 'over';
     const loser = activePlayers[0];
     if (loser) {
-      logMsg(`${loser.name} is the Shed!`);
+      const shedMsg = loser.isHuman ? 'You are the Shed!' : `${loser.name} is the Shed!`;
+      logMsg(shedMsg);
+      updatePrevTurn(shedMsg);
+      document.getElementById('status-msg').textContent = '';
       if (loser.isHuman) {
         showModal('You are the Shed! 😬');
       } else {
