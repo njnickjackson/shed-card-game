@@ -83,6 +83,14 @@ function effectiveTopCard() {
   return null;
 }
 
+// Returns a human-readable reason why a card cannot be played right now.
+function cantPlayReason() {
+  const top = effectiveTopCard();
+  if (!top) return "You can't play that.";
+  if (top.rank === '7') return `You can't play that. You must play a 7 or lower.`;
+  return `You can't play that. You must play a ${top.rank} or higher.`;
+}
+
 // Can `card` be played given current pile?
 function canPlay(card) {
   if (isJoker(card)) return true; // joker always playable
@@ -461,6 +469,7 @@ function onCardClick(cardId, source, slotIdx) {
       }
     }
     if (canPlay(card) || isJoker(card)) {
+      updateStatus('');
       G.selectedCards.push(cardId);
       // Auto-select all other hand cards of the same rank (except 2s and 10s)
       if (source === 'hand' && card.rank !== '2' && card.rank !== '10') {
@@ -471,7 +480,7 @@ function onCardClick(cardId, source, slotIdx) {
         });
       }
     } else {
-      updateStatus(`Can't play that card right now.`);
+      updateStatus(cantPlayReason());
     }
   } else {
     G.selectedCards.splice(idx, 1);
@@ -517,7 +526,7 @@ function onPlaySelected() {
     return;
   }
   if (!canPlay(cards[0])) {
-    updateStatus("You can't play that right now.");
+    updateStatus(cantPlayReason());
     return;
   }
 
