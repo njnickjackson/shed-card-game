@@ -689,6 +689,7 @@ function playCards(player, cards, source) {
 
   // Handle 10 (burn)
   if (cards[0].rank === '10') {
+    renderGame();
     showBurnAnimation();
     updatePrevTurn(`${player.name} played a 10 and burned the pile.`);
     updateStatus(`${player.name} played a 10 – pile burned! Play again.`);
@@ -704,6 +705,7 @@ function playCards(player, cards, source) {
   // Check for four-of-a-kind burn
   if (checkFourOfAKind()) {
     const burnedRank = G.pile[G.pile.length - 1].rank;
+    renderGame();
     showBurnAnimation();
     updatePrevTurn(`${player.name} completed four ${burnedRank}s and burned the pile.`);
     updateStatus(`Four ${burnedRank}s! Pile burned! ${player.name} plays again.`);
