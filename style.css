@@ -652,6 +652,49 @@ body {
   animation: pulse 1s infinite;
 }
 
+/* ─── Landscape Orientation Overlay ─────────────────────────────────────────── */
+#landscape-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: var(--felt);
+  align-items: center;
+  justify-content: center;
+}
+
+.landscape-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  padding: 24px;
+}
+
+.landscape-icon {
+  font-size: 4rem;
+  animation: rotate-hint 2s ease-in-out infinite;
+}
+
+@keyframes rotate-hint {
+  0%   { transform: rotate(0deg); }
+  40%  { transform: rotate(-90deg); }
+  60%  { transform: rotate(-90deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.landscape-message p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--white);
+  opacity: 0.85;
+}
+
+@media (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  #landscape-overlay { display: flex; }
+}
+
 /* ─── Responsive ─────────────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
   :root { --card-w: 56px; --card-h: 78px; }
