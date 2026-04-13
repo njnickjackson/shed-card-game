@@ -347,7 +347,8 @@ function updatePlayerPhase(player) {
     if (!player.out) {
       player.out = true;
       logMsg(`${player.name} is out! They didn't lose!`);
-      if (player.isHuman) {
+      const remainingActive = G.players.filter(p => !p.out).length;
+      if (player.isHuman && remainingActive > 1) {
         showModal("You didn't lose! 🎉");
       }
       checkGameOver();
