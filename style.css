@@ -517,18 +517,34 @@ body {
   text-align: center;
   flex-shrink: 0;
 }
-#status-msg { color: rgba(255,255,255,.9); }
+#status-msg {
+  display: block;
+  color: rgba(255,255,255,.9);
+  height: 1.4em;
+  line-height: 1.4em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 #prev-turn-msg {
   color: rgba(255,255,255,.35);
   font-size: .75rem;
   font-style: italic;
-  min-height: 1em;
+  height: 1.4em;
+  line-height: 1.4em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 #curr-turn-msg {
   color: rgba(255,255,255,.6);
   font-size: .8rem;
   font-style: italic;
-  min-height: 1em;
+  height: 1.4em;
+  line-height: 1.4em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   margin-bottom: 3px;
 }
 
