@@ -1460,6 +1460,82 @@ document.getElementById('in-game-rules-overlay').addEventListener('click', (e) =
   }
 });
 
+// ── Hand Scrub Gesture (mobile) ──────────────────────────────────────────────
+// Hold on a hand card to enter scrub mode, slide to choose, release to select.
+
+if (isMobile()) {
+  const handEl = document.getElementById('human-hand');
+  let scrub = null;
+
+  function scrubCardAt(x, y) {
+    const el = document.elementFromPoint(x, y);
+    return el?.closest('#human-hand .card[data-id]') ?? null;
+  }
+
+  function setScrubPreview(cardId) {
+    document.querySelectorAll('#human-hand .card').forEach(el => {
+      el.classList.toggle('scrub-preview', el.dataset.id === cardId);
+    });
+  }
+
+  handEl.addEventListener('touchstart', (e) => {
+    const cardEl = e.target.closest('.card[data-id]');
+    if (!cardEl) return;
+    const touch = e.touches[0];
+    const cardId = cardEl.dataset.id;
+    scrub = {
+      active: false,
+      previewId: cardId,
+      startX: touch.clientX,
+      startY: touch.clientY,
+      timer: setTimeout(() => {
+        scrub.active = true;
+        setScrubPreview(cardId);
+      }, 200),
+    };
+  }, { passive: true });
+
+  handEl.addEventListener('touchmove', (e) => {
+    if (!scrub) return;
+    const touch = e.touches[0];
+    if (!scrub.active) {
+      // Cancel if finger moved before hold completed (let scroll happen)
+      if (Math.hypot(touch.clientX - scrub.startX, touch.clientY - scrub.startY) > 8) {
+        clearTimeout(scrub.timer);
+        scrub = null;
+      }
+      return;
+    }
+    e.preventDefault(); // block scroll while scrubbing
+    const cardEl = scrubCardAt(touch.clientX, touch.clientY);
+    if (cardEl && cardEl.dataset.id !== scrub.previewId) {
+      scrub.previewId = cardEl.dataset.id;
+      setScrubPreview(scrub.previewId);
+    }
+  }, { passive: false });
+
+  handEl.addEventListener('touchend', (e) => {
+    if (!scrub) return;
+    clearTimeout(scrub.timer);
+    if (scrub.active) {
+      e.preventDefault(); // suppress the click event
+      setScrubPreview(null);
+      G.selectedCards = [];
+      onCardClick(scrub.previewId, 'hand', null);
+    }
+    scrub = null;
+  }, { passive: false });
+
+  handEl.addEventListener('touchcancel', () => {
+    if (!scrub) return;
+    clearTimeout(scrub.timer);
+    setScrubPreview(null);
+    scrub = null;
+  });
+
+  handEl.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+
 function startNewGame(numPlayers) {
   showScreen('screen-game');
   document.getElementById('prev-turn-msg').textContent = '';

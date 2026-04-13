@@ -399,6 +399,18 @@ body {
   transform: translateY(-10px);
   box-shadow: 0 0 0 3px var(--gold), 0 10px 20px rgba(0,0,0,.4);
 }
+.card.scrub-preview {
+  transform: translateY(-10px);
+  box-shadow: 0 0 0 2px rgba(244,162,97,.6), 0 10px 20px rgba(0,0,0,.4);
+}
+
+/* Prevent iOS/Android long-press context menu on hand cards */
+#human-hand .card,
+#human-hand .card * {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 .hand-crowded .card.selected,
 .hand-crowded .card.selected:hover:not(.no-hover) {
   opacity: 0.75;
