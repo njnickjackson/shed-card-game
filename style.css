@@ -491,6 +491,7 @@ body {
 /* Hand label */
 .hand-label {
   font-size: .7rem;
+  margin-top: 0.25rem;
   font-weight: 600;
   color: rgba(255,255,255,.55);
   letter-spacing: .06em;
