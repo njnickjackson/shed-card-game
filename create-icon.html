@@ -33,41 +33,42 @@
     ctx.fill();
     ctx.stroke();
 
-    // Shed drawing — centered on card (card center x=90, shed center y=90)
-    // Shed spans y=54 to y=126, center=90; between top S (~y=48) and bottom S (~y=134)
+    // Shed drawing — shifted up 5px for optical centering (triangle roof has lower visual weight)
+    // Shed spans y=49 to y=121; geometric center y=85, visual centroid ~y=90 (matches card center)
     ctx.strokeStyle = '#1b4332';
     ctx.lineWidth = 4;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
 
     // Roof (symmetric triangle centered at x=90)
+    // Shifted up 5px vs geometric center to compensate for triangle's lower visual weight
     ctx.beginPath();
-    ctx.moveTo(50, 88);
-    ctx.lineTo(90, 54);
-    ctx.lineTo(130, 88);
+    ctx.moveTo(50, 83);
+    ctx.lineTo(90, 49);
+    ctx.lineTo(130, 83);
     ctx.closePath();
     ctx.stroke();
 
     // Chimney — clear roof line behind it, then draw 3 sides
     ctx.fillStyle = '#f8f9fa';
-    ctx.fillRect(101, 56, 14, 32);  // erase roof line under chimney
+    ctx.fillRect(101, 51, 14, 32);  // erase roof line under chimney
     ctx.strokeStyle = '#1b4332';
     ctx.beginPath();
-    ctx.moveTo(101, 88);  // bottom-left (meets body top)
-    ctx.lineTo(101, 56);  // top-left
-    ctx.lineTo(115, 56);  // top-right
-    ctx.lineTo(115, 88);  // bottom-right
+    ctx.moveTo(101, 83);  // bottom-left (meets body top)
+    ctx.lineTo(101, 51);  // top-left
+    ctx.lineTo(115, 51);  // top-right
+    ctx.lineTo(115, 83);  // bottom-right
     ctx.stroke();
 
-    // Body — x=60 to x=120 (w=60), y=88 to y=126 (h=38)
-    ctx.strokeRect(60, 88, 60, 38);
+    // Body — x=60 to x=120 (w=60), y=83 to y=121 (h=38)
+    ctx.strokeRect(60, 83, 60, 38);
 
     // Window — left side of body
-    ctx.strokeRect(66, 96, 16, 13);
+    ctx.strokeRect(66, 91, 16, 13);
 
     // Door — right side of body, flush with bottom
     ctx.beginPath();
-    roundRect(ctx, 96, 100, 17, 26, 3);
+    roundRect(ctx, 96, 95, 17, 26, 3);
     ctx.stroke();
 
     // Rank "S" — top left
