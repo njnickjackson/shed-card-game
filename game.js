@@ -1416,16 +1416,8 @@ document.getElementById('btn-start').addEventListener('click', () => {
   }
 });
 
-document.querySelectorAll('.btn-player-count').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const count = btn.dataset.count;
-    if (count === '4') {
-      // Show 3-5 picker
-      document.getElementById('player-count-picker').classList.remove('hidden');
-    } else {
-      startNewGame(parseInt(count));
-    }
-  });
+document.getElementById('btn-player-range').addEventListener('click', () => {
+  document.getElementById('player-count-picker').classList.remove('hidden');
 });
 
 document.querySelectorAll('.btn-exact').forEach(btn => {

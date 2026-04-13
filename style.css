@@ -216,6 +216,7 @@ body {
 .btn-player-count .count { font-size: 2.5rem; font-weight: 900; color: var(--gold); }
 .btn-player-count .label { font-size: 1rem; font-weight: 600; }
 .btn-player-count .note { font-size: .8rem; color: rgba(255,255,255,.6); }
+#btn-player-range { min-width: 200px; }
 
 .count-picker { margin-top: 2rem; animation: fadeIn .3s ease; }
 .count-picker p { margin-bottom: 1rem; }
