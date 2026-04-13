@@ -466,6 +466,16 @@ function onCardClick(cardId, source, slotIdx) {
     // Only allow selecting same rank
     const card = findCard(player, cardId, source);
     if (!card) return;
+
+    // Opening turn: only the lowest card (or same rank) may be selected
+    if (G.openingCardId) {
+      const opener = findCardById(player, G.openingCardId);
+      if (opener && card.rank !== opener.rank) {
+        updateStatus(`You must start the game with your lowest card first (${displayCard(opener)}).`);
+        return;
+      }
+    }
+
     if (G.selectedCards.length > 0) {
       const firstCard = findCardById(player, G.selectedCards[0]);
       if (firstCard && firstCard.rank !== card.rank) {
