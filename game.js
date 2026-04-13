@@ -360,18 +360,20 @@ function checkGameOver() {
   if (activePlayers.length <= 1) {
     G.phase = 'over';
     const loser = activePlayers[0];
+    renderGame();
     if (loser) {
       const shedMsg = loser.isHuman ? 'You are the Shed!' : `${loser.name} is the Shed!`;
       logMsg(shedMsg);
       updatePrevTurn(shedMsg);
       document.getElementById('status-msg').textContent = '';
-      if (loser.isHuman) {
-        showModal('You are the Shed! 😬');
-      } else {
-        showModal(`${loser.name} is the Shed!`);
-      }
+      setTimeout(() => {
+        if (loser.isHuman) {
+          showModal('You are the Shed! 😬');
+        } else {
+          showModal(`${loser.name} is the Shed!`);
+        }
+      }, 500);
     }
-    renderGame();
     return true;
   }
   return false;
