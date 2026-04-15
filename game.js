@@ -587,7 +587,25 @@ function onPickupPile() {
   G.selectedCards = [];
 
   if (source === 'faceup') {
-    // In the face-up phase the player must also take one face-up card into hand
+    // In the face-up phase the player must also take one face-up card into hand.
+    // If all remaining face-up cards share the same rank, auto-take them.
+    const faceUpCards = player.faceUp.filter(Boolean);
+    const ranks = [...new Set(faceUpCards.map(c => c.rank))];
+    if (ranks.length === 1) {
+      const taken = [];
+      for (let i = 0; i < player.faceUp.length; i++) {
+        if (player.faceUp[i]) { taken.push(player.faceUp[i]); player.faceUp[i] = null; }
+      }
+      player.hand.push(...taken);
+      const desc = taken.length === 1 ? displayCard(taken[0]) : `${taken.length} ${taken[0].rank}s`;
+      logMsg(`${player.name} picked up the pile and ${desc} from the table.`);
+      updatePrevTurn(`You picked up the pile and ${desc} from the table.`);
+      updateStatus(`Picked up pile and ${desc} from the table.`);
+      renderGame();
+      advanceTurn();
+      return;
+    }
+    // Multiple ranks — player must choose
     G.awaitingFaceUpPickup = true;
     setPlayButton(false);
     setPickupButton(false);
@@ -1258,6 +1276,10 @@ function renderHumanPlayer() {
           cardEl.classList.remove('faceup-table');
           const isSelected = G.selectedCards.includes(fu.id);
           if (isSelected) cardEl.classList.add('selected');
+          if (G.awaitingFaceUpPickup) {
+            cardEl.style.outline = '2px solid var(--gold)';
+            cardEl.style.outlineOffset = '2px';
+          }
           cardEl.addEventListener('click', () => onCardClick(fu.id, 'faceup', i));
         }
         stack.appendChild(cardEl);
@@ -1312,7 +1334,7 @@ function renderHumanPlayer() {
     const isSelected = G.selectedCards.includes(card.id);
     if (isSelected) el.classList.add('selected');
 
-    if (G.phase === 'setup' || (source === 'hand' && currentPlayer() === player)) {
+    if ((G.phase === 'setup' || (source === 'hand' && currentPlayer() === player)) && !G.awaitingFaceUpPickup) {
       el.addEventListener('click', () => onCardClick(card.id, 'hand', null));
     } else {
       el.classList.add('no-hover');
