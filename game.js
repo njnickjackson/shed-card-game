@@ -779,7 +779,10 @@ function playCards(player, cards, source) {
 
   // Check if player is now out
   updatePlayerPhase(player);
-  if (player.out) return;
+  if (player.out) {
+    if (G.phase !== 'over') advanceTurn(skipCount);
+    return;
+  }
 
   advanceTurn(skipCount);
 }
