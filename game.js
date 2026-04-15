@@ -637,22 +637,33 @@ function flipFacedownCard(player, slotIdx) {
   document.getElementById('btn-confirm-facedown').classList.add('hidden');
   G.awaitingHumanFacedown = false;
 
-  // Reveal card
+  // Reveal card – remove from faceDown
   player.faceDown[slotIdx] = null;
 
-  if (canPlay(card)) {
-    // Play it
-    playCards(player, [card], 'facedown-reveal');
-  } else {
-    // Must pick up pile + the flipped card
-    player.hand.push(...G.pile, card);
-    G.pile = [];
-    logMsg(`${player.name} flipped ${displayCard(card)} – can't play it, picks up the pile.`);
-    updatePrevTurn(`You flipped ${displayCard(card)} – couldn't play it and picked up the pile.`);
-    updateStatus(`Flipped ${displayCard(card)} – can't play it. Picked up pile.`);
-    renderGame();
-    advanceTurn();
-  }
+  // Evaluate playability before pushing (pile state must not include the flipped card yet)
+  const playable = canPlay(card);
+
+  // Show the flipped card on the pile so the player can see it before resolving
+  G.pile.push(card);
+  updateStatus(`You flipped ${displayCard(card)}…`);
+  renderGame();
+
+  setTimeout(() => {
+    if (playable) {
+      // Remove from pile so playCards can add it back with full effect logic
+      G.pile.pop();
+      playCards(player, [card], 'facedown-reveal');
+    } else {
+      // Card is already on pile; pick up everything including the flipped card
+      player.hand.push(...G.pile);
+      G.pile = [];
+      logMsg(`${player.name} flipped ${displayCard(card)} – can't play it, picks up the pile.`);
+      updatePrevTurn(`You flipped ${displayCard(card)} – couldn't play it and picked up the pile.`);
+      updateStatus(`Flipped ${displayCard(card)} – can't play it. Picked up pile.`);
+      renderGame();
+      advanceTurn();
+    }
+  }, 700);
 }
 
 // ── Play Cards (shared) ───────────────────────────────────────────────────────
@@ -950,17 +961,29 @@ function executeCPUTurn(player) {
     const card = player.faceDown[slotIdx];
     player.faceDown[slotIdx] = null;
 
-    if (canPlay(card)) {
-      playCards(player, [card], 'facedown-reveal');
-    } else {
-      player.hand.push(...G.pile, card);
-      G.pile = [];
-      logMsg(`${player.name} flipped ${displayCard(card)} – can't play it, picks up the pile.`);
-      updatePrevTurn(`${player.name} flipped ${displayCard(card)} – couldn't play it and picked up the pile.`);
-      updateStatus(`${player.name} flipped ${displayCard(card)} – can't play it.`);
-      renderGame();
-      advanceTurn();
-    }
+    // Evaluate playability before pushing (pile state must not include the flipped card yet)
+    const playable = canPlay(card);
+
+    // Show the flipped card on the pile before resolving
+    G.pile.push(card);
+    updateStatus(`${player.name} flipped ${displayCard(card)}…`);
+    renderGame();
+
+    setTimeout(() => {
+      if (playable) {
+        // Remove from pile so playCards can add it back with full effect logic
+        G.pile.pop();
+        playCards(player, [card], 'facedown-reveal');
+      } else {
+        player.hand.push(...G.pile);
+        G.pile = [];
+        logMsg(`${player.name} flipped ${displayCard(card)} – can't play it, picks up the pile.`);
+        updatePrevTurn(`${player.name} flipped ${displayCard(card)} – couldn't play it and picked up the pile.`);
+        updateStatus(`${player.name} flipped ${displayCard(card)} – can't play it.`);
+        renderGame();
+        advanceTurn();
+      }
+    }, CPU_DELAY);
     return;
   }
 
